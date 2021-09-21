@@ -127,12 +127,12 @@ public class MatrixSizeManager : MonoBehaviour
     void FindNumberAround(int currentNumber, int i, int j)
     {
         temp[i, j] = 1;
+        Tab[i, j] = -1;
 
         if (j + 1 != Tab.GetLength(1))
         {
             if (Tab[i, j + 1] == currentNumber)
             {
-                Tab[i, j] = -1;
                 FindNumberAround(currentNumber, i, j + 1);
             }
         }
@@ -141,7 +141,6 @@ public class MatrixSizeManager : MonoBehaviour
         {
             if (Tab[i + 1, j] == currentNumber)
             {
-                Tab[i, j] = -1;
                 FindNumberAround(currentNumber, i + 1, j);
             }
         }
@@ -150,7 +149,6 @@ public class MatrixSizeManager : MonoBehaviour
         {
             if (Tab[i, j - 1] == currentNumber)
             {
-                Tab[i, j] = -1;
                 FindNumberAround(currentNumber, i, j - 1);
             }
         }
@@ -159,7 +157,6 @@ public class MatrixSizeManager : MonoBehaviour
         {
             if (Tab[i - 1, j] == currentNumber)
             {
-                Tab[i, j] = -1;
                 FindNumberAround(currentNumber, i - 1, j);
             }
         }
