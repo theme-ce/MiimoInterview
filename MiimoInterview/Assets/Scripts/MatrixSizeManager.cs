@@ -24,25 +24,20 @@ public class MatrixSizeManager : MonoBehaviour
     [SerializeField]
     Text biggestArea;
 
+    [SerializeField]
+    Color findColor;
+
     private int[,] Tab;
-
     private int[,] temp;
-
     private int[,] maxTemp;
-
-    private int count = 0;
-
-    private int maxCount = 0;
-
+    private int area = 0;
+    private int maxArea = 0;
     private int maxNumber;
-
-    public Color findColor;
 
     public void CreateMatrix()
     {
         if (xInput.text == "" || yInput.text == "")
         {
-            Debug.Log("Please Enter Value");
             return;
         }
 
@@ -81,12 +76,29 @@ public class MatrixSizeManager : MonoBehaviour
         {
             for (int j = 0; j < Tab.GetLength(1); j++)
             {
-                if (transform.GetChild(i).GetChild(j).GetComponent<InputField>().text == "")
+                if (
+                    transform
+                        .GetChild(i)
+                        .GetChild(j)
+                        .GetComponent<InputField>()
+                        .text ==
+                    ""
+                )
                 {
-                    transform.GetChild(i).GetChild(j).GetComponent<InputField>().text = "0";
+                    transform
+                        .GetChild(i)
+                        .GetChild(j)
+                        .GetComponent<InputField>()
+                        .text = "0";
                 }
 
-                Tab[i, j] = int.Parse(transform.GetChild(i).GetChild(j).GetComponent<InputField>().text);
+                Tab[i, j] =
+                    int
+                        .Parse(transform
+                            .GetChild(i)
+                            .GetChild(j)
+                            .GetComponent<InputField>()
+                            .text);
             }
         }
     }
@@ -98,63 +110,18 @@ public class MatrixSizeManager : MonoBehaviour
             return;
         }
 
-        maxCount = 0;
-
         GetMatrix();
+        maxArea = 0;
 
-        int currentNumber = 0;
-
-        //i = row , j = column
         for (int i = 0; i < Tab.GetLength(0); i++)
         {
             for (int j = 0; j < Tab.GetLength(1); j++)
             {
-                transform.GetChild(i).GetChild(j).GetComponent<Image>().color = Color.white;
-
-                if (Tab[i, j] != currentNumber && Tab[i, j] != -1)
-                {
-                    currentNumber = Tab[i, j];
-
-                    temp = new int[Tab.GetLength(0), Tab.GetLength(1)];
-
-                    FindNumberAround (currentNumber, i, j);
-
-                    for (int k = 0; k < temp.GetLength(0); k++)
-                    {
-                        for (int l = 0; l < temp.GetLength(1); l++)
-                        {
-                            if (temp[k, l] == 1)
-                            {
-                                count += 1;
-                            }
-                        }
-                    }
-
-                    if (count > maxCount)
-                    {
-                        maxCount = count;
-                        maxNumber = currentNumber;
-                        maxTemp = temp;
-                    }
-
-                    count = 0;
-                }
+                CountCurrentArea (i, j);
             }
         }
 
-        biggestNum.text = "Biggest Number is " + maxNumber.ToString();
-        biggestArea.text = "Biggest Area is " + maxCount.ToString();
-
-        for (int i = 0; i < maxTemp.GetLength(0); i++)
-        {
-            for (int j = 0; j < maxTemp.GetLength(1); j++)
-            {
-                if(maxTemp[i, j] == 1)
-                {
-                    transform.GetChild(i).GetChild(j).GetComponent<Image>().color = findColor;
-                }
-            }
-        }
+        SetResult();
     }
 
     void FindNumberAround(int currentNumber, int i, int j)
@@ -194,6 +161,73 @@ public class MatrixSizeManager : MonoBehaviour
             {
                 Tab[i, j] = -1;
                 FindNumberAround(currentNumber, i - 1, j);
+            }
+        }
+    }
+
+    void CountCurrentArea(int i, int j)
+    {
+        if (Tab[i, j] != -1)
+        {
+            int currentNumber = Tab[i, j];
+            temp = new int[Tab.GetLength(0), Tab.GetLength(1)];
+            FindNumberAround (currentNumber, i, j);
+
+            area = Area(temp);
+
+            if (area > maxArea)
+            {
+                maxArea = area;
+                maxNumber = currentNumber;
+                maxTemp = temp;
+            }
+
+            area = 0;
+        }
+    }
+
+    int Area(int[,] temp)
+    {
+        int area = 0;
+        for (int k = 0; k < temp.GetLength(0); k++)
+        {
+            for (int l = 0; l < temp.GetLength(1); l++)
+            {
+                if (temp[k, l] == 1)
+                {
+                    area += 1;
+                }
+            }
+        }
+
+        return area;
+    }
+
+    void SetResult()
+    {
+        biggestNum.text = "Biggest Number is " + maxNumber.ToString();
+        biggestArea.text = "Biggest Area is " + maxArea.ToString();
+
+        for (int i = 0; i < maxTemp.GetLength(0); i++)
+        {
+            for (int j = 0; j < maxTemp.GetLength(1); j++)
+            {
+                if (maxTemp[i, j] == 1)
+                {
+                    transform
+                        .GetChild(i)
+                        .GetChild(j)
+                        .GetComponent<Image>()
+                        .color = findColor;
+                }
+                else
+                {
+                    transform
+                        .GetChild(i)
+                        .GetChild(j)
+                        .GetComponent<Image>()
+                        .color = Color.white;
+                }
             }
         }
     }

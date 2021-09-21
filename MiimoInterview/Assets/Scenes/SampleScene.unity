@@ -275,7 +275,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Find!
+  m_Text: FIND!
 --- !u!222 &46001211
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1700,7 +1700,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 3. Click Find! and get your result
+  m_Text: 3. Click "FIND!" and get your result
 --- !u!222 &1275875285
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2475,7 +2475,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 1. Input matrix size (x, y) and click Apply
+  m_Text: 1. Input matrix size (x, y) and click "APPLY"
 --- !u!222 &1843005168
 CanvasRenderer:
   m_ObjectHideFlags: 0
