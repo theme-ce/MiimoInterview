@@ -1,85 +1,230 @@
-﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using UnityEngine;
+using UnityEngine.UI;
 
-namespace MatrixProblem
+public class Matrix : MonoBehaviour
 {
-    class Matrix
+    [SerializeField]
+    InputField xInput;
+
+    [SerializeField]
+    InputField yInput;
+
+    [SerializeField]
+    GameObject horizontalContent;
+
+    [SerializeField]
+    GameObject numberField;
+
+    [SerializeField]
+    Text biggestNum;
+
+    [SerializeField]
+    Text biggestArea;
+
+    [SerializeField]
+    Color findColor;
+
+    private int[,] Tab;
+    private int[,] temp;
+    private int[,] maxTemp;
+    private int area = 0;
+    private int maxArea = 0;
+    private int maxNumber;
+
+    public void CreateMatrix()
     {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-
-        private int[,] Tab;
-
-        public Matrix(int x, int y)
+        if (xInput.text == "" || yInput.text == "")
         {
-            if (x <= 0 || y <= 0)
-                throw new System.ArgumentException("Invalid arguments");
+            return;
+        }
 
-            X = x;
-            Y = y;
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
 
-            Tab = new int[Y, X];
-            for (int i = 0; i < X; ++i)
+        int xLength = int.Parse(xInput.text);
+        int yLength = int.Parse(yInput.text);
+
+        Tab = new int[yLength, xLength];
+
+        for (int i = 0; i < yLength; i++)
+        {
+            var content =
+                Instantiate(horizontalContent,
+                Vector3.zero,
+                Quaternion.identity,
+                this.transform);
+
+            for (int j = 0; j < xLength; j++)
             {
-                for (int j = 0; j < Y; ++j)
+                var number =
+                    Instantiate(numberField,
+                    Vector3.zero,
+                    Quaternion.identity,
+                    content.transform);
+            }
+        }
+    }
+
+    public void GetMatrix()
+    {
+        for (int i = 0; i < Tab.GetLength(0); i++)
+        {
+            for (int j = 0; j < Tab.GetLength(1); j++)
+            {
+                if (
+                    transform
+                        .GetChild(i)
+                        .GetChild(j)
+                        .GetComponent<InputField>()
+                        .text ==
+                    ""
+                )
                 {
-                    Tab[j, i] = 0;
+                    transform
+                        .GetChild(i)
+                        .GetChild(j)
+                        .GetComponent<InputField>()
+                        .text = "0";
+                }
+
+                Tab[i, j] =
+                    int
+                        .Parse(transform
+                            .GetChild(i)
+                            .GetChild(j)
+                            .GetComponent<InputField>()
+                            .text);
+            }
+        }
+    }
+
+    public void FindCountElementOfBiggestArea()
+    {
+        if (xInput.text == "" || yInput.text == "")
+        {
+            return;
+        }
+
+        GetMatrix();
+        maxArea = 0;
+
+        for (int i = 0; i < Tab.GetLength(0); i++)
+        {
+            for (int j = 0; j < Tab.GetLength(1); j++)
+            {
+                CountCurrentArea (i, j);
+            }
+        }
+
+        SetResult();
+    }
+
+    void FindNumberAround(int currentNumber, int i, int j)
+    {
+        temp[i, j] = 1;
+        Tab[i, j] = -1;
+
+        if (j + 1 != Tab.GetLength(1))
+        {
+            if (Tab[i, j + 1] == currentNumber)
+            {
+                FindNumberAround(currentNumber, i, j + 1);
+            }
+        }
+
+        if (i + 1 != Tab.GetLength(0))
+        {
+            if (Tab[i + 1, j] == currentNumber)
+            {
+                FindNumberAround(currentNumber, i + 1, j);
+            }
+        }
+
+        if (j - 1 > -1)
+        {
+            if (Tab[i, j - 1] == currentNumber)
+            {
+                FindNumberAround(currentNumber, i, j - 1);
+            }
+        }
+
+        if (i - 1 > -1)
+        {
+            if (Tab[i - 1, j] == currentNumber)
+            {
+                FindNumberAround(currentNumber, i - 1, j);
+            }
+        }
+    }
+
+    void CountCurrentArea(int i, int j)
+    {
+        if (Tab[i, j] != -1)
+        {
+            int currentNumber = Tab[i, j];
+            temp = new int[Tab.GetLength(0), Tab.GetLength(1)];
+            FindNumberAround (currentNumber, i, j);
+
+            area = Area(temp);
+
+            if (area > maxArea)
+            {
+                maxArea = area;
+                maxNumber = currentNumber;
+                maxTemp = temp;
+            }
+
+            area = 0;
+        }
+    }
+
+    int Area(int[,] temp)
+    {
+        int area = 0;
+        for (int k = 0; k < temp.GetLength(0); k++)
+        {
+            for (int l = 0; l < temp.GetLength(1); l++)
+            {
+                if (temp[k, l] == 1)
+                {
+                    area += 1;
                 }
             }
         }
 
-        public Matrix(int[,] values)
+        return area;
+    }
+
+    void SetResult()
+    {
+        biggestNum.text = "Biggest Number is " + maxNumber.ToString();
+        biggestArea.text = "Biggest Area is " + maxArea.ToString();
+
+        for (int i = 0; i < maxTemp.GetLength(0); i++)
         {
-            if (values == null)
-                throw new System.ArgumentException("Invalid arguments");
-
-            X = values.GetLength(1);
-            Y = values.GetLength(0);
-
-            Tab = new int[Y, X];
-            for (int i = 0; i < X; ++i)
+            for (int j = 0; j < maxTemp.GetLength(1); j++)
             {
-                for (int j = 0; j < Y; ++j)
+                if (maxTemp[i, j] == 1)
                 {
-                    Tab[j, i] = values[j, i];
+                    transform
+                        .GetChild(i)
+                        .GetChild(j)
+                        .GetComponent<Image>()
+                        .color = findColor;
+                }
+                else
+                {
+                    transform
+                        .GetChild(i)
+                        .GetChild(j)
+                        .GetComponent<Image>()
+                        .color = Color.white;
                 }
             }
-        }
-
-        public int GetValue(int x, int y)
-        {
-            if (x < 0 || x >= X || y < 0 || y >= Y)
-                throw new System.ArgumentException("Invalid arguments");
-
-            return Tab[y, x];
-        }
-
-        public void Print()
-        {
-            for (int y=0; y<Y; ++y)
-		    {
-			    if (y==0 || y==Y-1) Console.Write("[");
-			    else Console.Write("|");
-			
-			    for (int x=0; x<X; ++x)
-			    {
-				    Console.Write("" + GetValue(x, y));
-                    if (x < X - 1) Console.Write(" ");
-			    }
-			
-			    if (y==0 || y==Y-1) Console.WriteLine("]");
-			    else Console.WriteLine("|");
-		    }
-        }
-
-        //find the biggest area (the area composed with the biggest number of elements)
-        //return the number of elements from this area.
-        public int FindCountElementOfBiggestArea()
-        {
-            //TODO: implement the function
-            return 0;
         }
     }
 }
